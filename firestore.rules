@@ -1,0 +1,16 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /devices/{token} {
+      allow read: if false;
+      allow delete: if false;
+      allow create, update: if token.size() > 100 && token.size() < 400
+        && request.resource.data.keys().hasOnly(['prefs', 'updatedAt'])
+        && request.resource.data.prefs.keys().hasOnly(['final', 'goals', 'start'])
+        && request.resource.data.prefs.final is bool
+        && request.resource.data.prefs.goals is bool
+        && request.resource.data.prefs.start is bool;
+    }
+    match /{document=**} { allow read, write: if false; }
+  }
+}
